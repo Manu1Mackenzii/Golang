@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-
 	"math/rand"
 	"os"
 	"time"
@@ -86,6 +85,7 @@ func (s *AuthService) Login(email, password string) (string, string, error) {
 	}
 
 	if !helpers.CheckPasswordHash(password, user.PasswordHash) {
+		ErrInvalidCredentials := errors.New("invalid credentials")
 		return "", "", ErrInvalidCredentials
 	}
 
@@ -106,6 +106,50 @@ func (s *AuthService) Login(email, password string) (string, string, error) {
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+func (s *AuthService) GetAllUsers() ([]models.Users, error) {
+
+	var users []models.Users
+
+	if err := s.DB.Find(&users).Error; err != nil {
+
+		return nil, err
+
+	}
+
+	return users, nil
+
+}
+
+func (s *AuthService) GetPublicUserInfoByID(userID string) (*models.Users, error) {
+
+	var user models.Users
+
+	if err := s.DB.Select("username", "email", "location", "role").Where("id = ?", userID).First(&user).Error; err != nil {
+
+		return nil, err
+
+	}
+
+	return &user, nil
+
+}
+
+func (s *AuthService) DeleteUserAndRelatedData(userID string) error {
+
+	// Implement the logic to delete user and related data from the database
+
+	if err := s.DB.Where("id = ?", userID).Delete(&models.Users{}).Error; err != nil {
+
+		return err
+
+	}
+
+	// Add logic to delete related data if necessary
+
+	return nil
+
 }
 
 // UpdateRefreshToken met à jour le refresh token d'un utilisateur
@@ -176,21 +220,21 @@ func (s *AuthService) UpdateUser(id string, userInfo models.Users) (models.Users
 		return models.Users{}, err
 	}
 
-	// Mise à jour des champs de l'utilisateur
-	user.Username = userInfo.Username
-	user.Email = userInfo.Email
-	user.ProfilePhoto = userInfo.ProfilePhoto
-	user.FavoriteSport = userInfo.FavoriteSport
-	user.Location = userInfo.Location
-	user.Bio = userInfo.Bio
-
-	// Mettre à jour le mot de passe si fourni
+	if userInfo.Username != "" {
+		user.Username = userInfo.Username
+	}
+	if userInfo.Email != "" {
+		user.Email = userInfo.Email
+	}
 	if userInfo.PasswordHash != "" {
 		hashedPassword, err := helpers.HashPassword(userInfo.PasswordHash)
 		if err != nil {
 			return models.Users{}, err
 		}
 		user.PasswordHash = hashedPassword
+	}
+	if userInfo.ProfilePhoto != "" {
+		user.ProfilePhoto = userInfo.ProfilePhoto
 	}
 
 	if err := s.DB.Save(&user).Error; err != nil {
@@ -207,71 +251,9 @@ func (s *AuthService) DeleteUser(id string) error {
 		return err
 	}
 
-	// Supprimer les amis et demandes d'amis
-	if err := s.DB.Where("sender_id = ? OR receiver_id = ?", id, id).Delete(&models.FriendRequest{}).Error; err != nil {
-		return err
-	}
-
-	// Supprimer les concerts organisés par cet utilisateur
-	if err := s.DB.Where("organizer_id = ?", id).Delete(&models.Event{}).Error; err != nil {
-		return err
-	}
-
-	// Supprimer l'utilisateur
 	if err := s.DB.Delete(&user).Error; err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// GetAllUsers récupère tous les utilisateurs
-func (s *AuthService) GetAllUsers() ([]models.Users, error) {
-	var users []models.Users
-	if err := s.DB.Find(&users).Error; err != nil {
-		return nil, err
-	}
-	return users, nil
-}
-
-// SendConfirmationEmail utilise le service Email pour envoyer un lien de confirmation à l'utilisateur
-func (s *AuthService) SendConfirmationEmail(email, confirmationToken string) error {
-	return s.EmailService.SendConfirmationEmail(email, confirmationToken)
-}
-
-// Erreurs spécifiques
-var ErrInvalidCredentials = errors.New("invalid credentials")
-
-// GetPublicUserInfoByID retrieves public user information by ID
-
-func (s *AuthService) GetPublicUserInfoByID(userID string) (*models.Users, error) {
-
-	var user models.Users
-
-	if err := s.DB.Select("username", "email", "location", "role").Where("id = ?", userID).First(&user).Error; err != nil {
-
-		return nil, err
-
-	}
-
-	return &user, nil
-
-}
-
-func (s *AuthService) UpdateUserStatistics(userID string, matchesPlayed, matchesWon, goalsScored, behaviorScore int) error {
-
-	return s.DB.Model(&models.Users{}).Where("id = ?", userID).Updates(models.Users{}).Error
-
-}
-
-func (s *AuthService) DeleteUserAndRelatedData(userID string) error {
-
-	if err := s.DB.Where("id = ?", userID).Delete(&models.Users{}).Error; err != nil {
-
-		return err
-
-	}
-
-	return nil
-
 }

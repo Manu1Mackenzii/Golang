@@ -41,6 +41,9 @@ COPY --from=builder /app/api .
 # Copier la documentation Swagger générée depuis l'image builder
 COPY --from=builder /app/docs ./docs
 
+# Copier le fichier .env dans le conteneur
+COPY .env .env
+
 # Lister les fichiers dans le répertoire docs pour vérifier qu'ils sont bien copiés
 RUN ls -la ./docs
 

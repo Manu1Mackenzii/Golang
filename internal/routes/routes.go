@@ -23,11 +23,11 @@ func SetupRoutesAuth(app *fiber.App, controller *controllers.AuthController) {
 	// Routes protégées (requièrent authentification)
 	api.Use(middlewares.JWTMiddleware)
 	api.Put("/userUpdate", controller.UserUpdate)
-	api.Get("/userInfo", controller.GetUserInfoHandler)
+	// api.Get("/userInfo", controller.GetUserInfoHandler)
 	api.Get("/users", controller.GetUsersHandler)
 	api.Get("/users/:id/public", controller.GetPublicUserInfoHandler)
 	api.Delete("/deleteMyAccount", controller.DeleteUserHandler)
-	api.Post("/UpdateUserStatistics", controller.UpdateUserStatistics)
+	// api.Post("/UpdateUserStatistics", controller.UpdateUserStatistics)
 }
 
 // SetupRoutesEvents configure les routes pour gérer les événements.
@@ -75,7 +75,7 @@ func SetupOpenAiRoutes(app *fiber.App, controller *controllers.OpenAiController)
 	api := app.Group("/api")
 	api.Use(middlewares.JWTMiddleware)
 
-	api.Get("/openai/suggestions/:event_id", controller.SuggestConcerts) // Obtenir des suggestions basées sur un événement
+	// api.Get("/openai/suggestions/:event_id", controller.SuggestConcerts)
 }
 
 // SetupRoutes configure toutes les routes de l'application.

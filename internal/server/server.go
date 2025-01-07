@@ -48,7 +48,6 @@ func Run() {
 	// Initialize services and controllers
 	imageService := services.NewImageService("./uploads")
 	emailService := services.NewEmailService()
-
 	authService := services.NewAuthService(db, imageService, emailService)
 	webSocketService := services.NewWebSocketService()
 	notificationService := services.NewNotificationService(db, redisClient, notificationBroadcast, webSocketService)
@@ -57,13 +56,13 @@ func Run() {
 
 	friendService := services.NewFriendService(db, authService, webSocketService)
 	friendController := controllers.NewFriendController(friendService, notificationService)
-	chatService := services.NewChatService(db, redisClient)
-	matchController := controllers.NewMatchController(matchService, authService, db, chatService, redisClient)
+	// chatService := services.NewChatService(db, redisClient)
+	// matchController := controllers.NewMatchController(matchService, authService, db, chatService, redisClient)
 	matchPlayersService := services.NewMatchPlayersService(db)
-	matchPlayersController := controllers.NewMatchPlayersController(matchPlayersService, authService, db)
-	chatController := controllers.NewChatController(chatService)
+	// matchPlayersController := controllers.NewMatchPlayersController(matchPlayersService, authService, db)
+	// chatController := controllers.NewChatController(chatService)
 	openAiController := controllers.NewOpenAiController(openAIService, matchPlayersService)
-	authController := controllers.NewAuthController(authService)
+	authController := controllers.NewAuthController(authService, imageService)
 	friendChatController := controllers.NewfriendChatController(friendChatService, friendService)
 
 	// Configure Fiber app
@@ -90,9 +89,9 @@ func Run() {
 		return c.SendString("Welcome to TeamUp API!")
 	})
 	routes.SetupRoutesAuth(app, authController)
-	routes.SetupRoutesMatches(app, matchController)
-	routes.SetupRoutesMatchePlayers(app, matchPlayersController)
-	routes.SetupChatRoutes(app, chatController)
+	// routes.SetupRoutesMatches(app, matchController)
+	// routes.SetupRoutesMatchePlayers(app, matchPlayersController)
+	// routes.SetupChatRoutes(app, chatController)
 	routes.SetupOpenAiRoutes(app, openAiController)
 	routes.SetupFriendRoutes(app, friendController)
 	routes.SetupRoutesFriendMessage(app, friendChatController)
@@ -122,9 +121,9 @@ func Run() {
 		ticker := time.NewTicker(1 * time.Minute)
 		defer ticker.Stop()
 		for range ticker.C {
-			if err := matchService.UpdateMatchStatuses(); err != nil {
-				log.Printf("Erreur lors de la mise à jour des statuts des matchs : %v", err)
-			}
+			// if err := matchService.UpdateMatchStatuses(); err != nil {
+			// 	log.Printf("Erreur lors de la mise à jour des statuts des matchs : %v", err)
+			// }
 		}
 	}()
 

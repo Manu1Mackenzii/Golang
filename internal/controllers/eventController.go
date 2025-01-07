@@ -47,18 +47,9 @@ func NewEventController(eventService *services.EventService, authService *servic
 // CreateEvent handles the creation of a new event
 func (ec *EventController) CreateEvent(c *fiber.Ctx) error {
 	var event models.Event
-
-	// Parse input data
 	if err := c.BodyParser(&event); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
-
-	// Validate user authentication
-	userID, err := ec.AuthService.GetUserIDFromToken(c)
-	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
-	}
-	event.UserID = userID
 
 	// Validate and fetch coordinates for the address
 	lat, lng, err := getCoordinates(event.Address, "YOUR_API_KEY")
@@ -69,12 +60,12 @@ func (ec *EventController) CreateEvent(c *fiber.Ctx) error {
 	event.Longitude = lng
 
 	// Create the event
-	createdEvent, err := ec.EventService.CreateEvent(&event)
+	err = ec.EventService.CreateEvent(&event, "additional_argument")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create event"})
 	}
 
-	return c.JSON(createdEvent)
+	return c.JSON(fiber.Map{"event": event})
 }
 
 // GetAllEvents retrieves all events
