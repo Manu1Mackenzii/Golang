@@ -1,5 +1,9 @@
 # Fichier .gitignore pour un projet Go
 
+.env
+
+./env
+
 # Binaires pour les programmes et les plugins
 *.exe
 *.exe~
@@ -60,7 +64,3 @@ Dockerfile
 go.mod
 
 
-
-.env
-
-./env
