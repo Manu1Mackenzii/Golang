@@ -62,19 +62,10 @@ SECRET_KEY=secret
 
 # Pour créer un match 
 
-- Route : `/api/matches/`
+- Route : `/api/events/`
 - **Authorization** : Nécessite un token utilisateur dans l'en-tête `Authorization` (Bearer Token).
 - Modèle de données du JSON à envoyer : 
-```json
-{
-    "organizer_id": "string",
-    "referee_id": "string", // optionnel
-    "description": "string", // optionnel
-    "match_date": "YYYY-MM-DD",
-    "match_time": "HH:MM",
-    "address": "string",
-    "number_of_players": integer
-}
+
 
 
 # Authentification avec Google Cloud

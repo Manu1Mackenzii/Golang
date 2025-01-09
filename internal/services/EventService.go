@@ -19,8 +19,8 @@ func NewEventService(db *gorm.DB) *EventService {
 }
 
 // CreateEvent creates a new event in the database
-func (s *EventService) CreateEvent(event *models.Event, organizerID string) error {
-	event.OrganizerID = organizerID
+func (s *EventService) CreateEvent(event *models.Event, UserID int64) error {
+	event.UserID = UserID
 	event.Status = "upcoming"
 	event.CreatedAt = time.Now()
 	event.UpdatedAt = time.Now()
@@ -35,7 +35,7 @@ func (s *EventService) CreateEvent(event *models.Event, organizerID string) erro
 // GetEventByID retrieves an event by its ID
 func (s *EventService) GetEventByID(eventID int) (*models.Event, error) {
 	var event models.Event
-	if err := s.DB.Where("event_id = ?", eventID).First(&event).Error; err != nil {
+	if err := s.DB.Where("id = ?", eventID).First(&event).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("event not found")
 		}
@@ -74,8 +74,6 @@ func (s *EventService) DeleteEvent(eventID int) error {
 		return err
 	}
 
-	now := time.Now()
-	event.DeletedAt = &now
 	if err := s.DB.Save(&event).Error; err != nil {
 		return err
 	}
@@ -126,8 +124,6 @@ func (s *EventService) SoftDeleteEvent(eventID int) error {
 		return err
 	}
 
-	now := time.Now()
-	event.DeletedAt = &now
 	if err := s.DB.Save(&event).Error; err != nil {
 		return err
 	}

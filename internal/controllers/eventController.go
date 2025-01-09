@@ -16,7 +16,6 @@ import (
 
 type EventController struct {
 	EventService *services.EventService
-	ChatService  *services.ChatService
 	RedisClient  *redis.Client
 	AuthService  *services.AuthService
 	DB           *gorm.DB
@@ -34,12 +33,11 @@ type GeoResponse struct {
 }
 
 // NewEventController creates a new EventController instance
-func NewEventController(eventService *services.EventService, authService *services.AuthService, db *gorm.DB, chatService *services.ChatService, redisClient *redis.Client) *EventController {
+func NewEventController(eventService *services.EventService, authService *services.AuthService, db *gorm.DB, redisClient *redis.Client) *EventController {
 	return &EventController{
 		EventService: eventService,
 		AuthService:  authService,
 		DB:           db,
-		ChatService:  chatService,
 		RedisClient:  redisClient,
 	}
 }
@@ -60,7 +58,7 @@ func (ec *EventController) CreateEvent(c *fiber.Ctx) error {
 	event.Longitude = lng
 
 	// Create the event
-	err = ec.EventService.CreateEvent(&event, "additional_argument")
+	err = ec.EventService.CreateEvent(&event, 1)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create event"})
 	}

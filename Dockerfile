@@ -44,6 +44,9 @@ COPY --from=builder /app/docs ./docs
 # Copier le fichier .env dans le conteneur
 COPY .env .env
 
+COPY config.yaml /app/config.yaml
+
+
 # Lister les fichiers dans le répertoire docs pour vérifier qu'ils sont bien copiés
 RUN ls -la ./docs
 

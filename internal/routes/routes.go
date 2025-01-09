@@ -35,11 +35,23 @@ func SetupRoutesEvents(app *fiber.App, controller *controllers.EventController) 
 	api := app.Group("/api/events")
 	api.Use(middlewares.JWTMiddleware)
 
-	api.Get("/", controller.GetAllEvents)      // Récupérer tous les événements
-	api.Post("/", controller.CreateEvent)      // Créer un nouvel événement
-	api.Delete("/:id", controller.DeleteEvent) // Supprimer un événement
+	api.Get("/", controller.GetAllEvents)             // Récupérer tous les événements
+	api.Post("/createEvent/", controller.CreateEvent) // Créer un nouvel événement
+	api.Delete("/event/:id", controller.DeleteEvent)  // Supprimer un événement
 	api.Get("/:event_id", controller.GetEventByID)
 	api.Put("/:id", controller.UpdateEvent)
+}
+
+// SetupRoutesCategories configure les routes pour gérer les catégories.
+func SetupRoutesCategories(app *fiber.App, controller *controllers.CategoryController) {
+	api := app.Group("/api/categories")
+	api.Use(middlewares.JWTMiddleware)
+
+	api.Get("/", controller.GetCategories)
+	api.Get("/:id", controller.GetCategory)
+	api.Post("/createCategory", controller.CreateCategory)
+	api.Delete("/:id", controller.DeleteCategory)
+	api.Put("/:id", controller.UpdateCategory)
 }
 
 // SetupFriendRoutes configure les routes pour gérer les relations d'amis.
@@ -79,11 +91,13 @@ func SetupOpenAiRoutes(app *fiber.App, controller *controllers.OpenAiController)
 }
 
 // SetupRoutes configure toutes les routes de l'application.
-func SetupRoutes(app *fiber.App, authController *controllers.AuthController, eventController *controllers.EventController, friendController *controllers.FriendController, friendChatController *controllers.FriendChatController, wsController *controllers.WebSocketController, aiController *controllers.OpenAiController) {
+func SetupRoutes(app *fiber.App, authController *controllers.AuthController, eventController *controllers.EventController, categoryController *controllers.CategoryController, friendController *controllers.FriendController, friendChatController *controllers.FriendChatController, wsController *controllers.WebSocketController, aiController *controllers.OpenAiController) {
 	SetupRoutesAuth(app, authController)
 	SetupRoutesEvents(app, eventController)
+	SetupRoutesCategories(app, categoryController)
 	SetupFriendRoutes(app, friendController)
 	SetupRoutesFriendMessage(app, friendChatController)
 	SetupRoutesWebSocket(app, wsController)
 	SetupOpenAiRoutes(app, aiController)
+
 }

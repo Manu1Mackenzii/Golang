@@ -53,6 +53,8 @@ func Run() {
 	notificationService := services.NewNotificationService(db, redisClient, notificationBroadcast, webSocketService)
 	openAIService := services.NewOpenAIService()
 	friendChatService := services.NewFriendChatService(db, webSocketService)
+	categoryService := services.NewCategoryService(db)
+	eventService := services.NewEventService(db)
 
 	friendService := services.NewFriendService(db, authService, webSocketService)
 	friendController := controllers.NewFriendController(friendService, notificationService)
@@ -64,6 +66,8 @@ func Run() {
 	openAiController := controllers.NewOpenAiController(openAIService, matchPlayersService)
 	authController := controllers.NewAuthController(authService, imageService)
 	friendChatController := controllers.NewfriendChatController(friendChatService, friendService)
+	categoryController := controllers.NewCategoryController(categoryService, authService, db, redisClient)
+	eventController := controllers.NewEventController(eventService, authService, db, redisClient)
 
 	// Configure Fiber app
 	app := fiber.New()
@@ -89,12 +93,11 @@ func Run() {
 		return c.SendString("Welcome to TeamUp API!")
 	})
 	routes.SetupRoutesAuth(app, authController)
-	// routes.SetupRoutesMatches(app, matchController)
-	// routes.SetupRoutesMatchePlayers(app, matchPlayersController)
-	// routes.SetupChatRoutes(app, chatController)
+	routes.SetupRoutesCategories(app, categoryController)
 	routes.SetupOpenAiRoutes(app, openAiController)
 	routes.SetupFriendRoutes(app, friendController)
 	routes.SetupRoutesFriendMessage(app, friendChatController)
+	routes.SetupRoutesEvents(app, eventController)
 
 	// Swagger route
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)

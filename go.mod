@@ -1,6 +1,6 @@
 module github.com/mackenzii/freemusic
 
-go  1.20
+go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.10.0
@@ -28,6 +28,7 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect

@@ -1,0 +1,15 @@
+database:
+  host: postgres
+  port: "5432"
+  user: postgres
+  password: postgres
+  dbname: postgres
+
+redis:
+  host: redis
+  port: "6379"
+  password: ""
+
+jwt:
+  secret: "mysecret"
+  expirationHours: 24
